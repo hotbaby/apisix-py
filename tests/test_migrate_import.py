@@ -16,5 +16,5 @@ class TestMigrateImportAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.migrate_api = MigrateAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
 
-    def test_import_data(self):
-        self.migrate_api.import_data('./migrate')
+    # def test_import_data(self):
+    #     self.migrate_api.import_data('./migrate')

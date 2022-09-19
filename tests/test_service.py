@@ -41,6 +41,7 @@ class TestServiceAPI(unittest.TestCase):
         service = resp['data']
         print(json.dumps(resp, ensure_ascii=False))
 
-        service['update_time'] = int(time.time())
+        service.pop('update_time')
+        service.pop('create_time')
         resp = self.service_api.update(service['id'], service)
         assert resp['code'] == 0

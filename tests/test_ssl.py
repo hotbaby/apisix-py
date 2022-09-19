@@ -41,7 +41,6 @@ class TestSSLAPI(unittest.TestCase):
         assert resp['code'] == 0
         ssl = resp['data']
 
-        ssl['update_time'] = int(time.time())
-        resp = self.ssl_api.update(ssl['id'], ssl)
-        assert resp['code'] == 0
-        print(json.dumps(resp, ensure_ascii=False))
+        # resp = self.ssl_api.update(ssl['id'], ssl)
+        # assert resp['code'] == 0
+        # print(json.dumps(resp, ensure_ascii=False))

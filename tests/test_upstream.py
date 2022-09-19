@@ -39,7 +39,8 @@ class TestUpstreamAPI(unittest.TestCase):
         assert resp['code'] == 0
         upstream = resp['data']
 
-        upstream['update_time'] = int(time.time())
+        upstream.pop('update_time')
+        upstream.pop('create_time')
         resp = self.upstream_api.update(upstream['id'], upstream)
         print(json.dumps(resp, ensure_ascii=False))
         assert resp['code'] == 0

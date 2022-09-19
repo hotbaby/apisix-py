@@ -40,6 +40,8 @@ class TestRouteAPI(unittest.TestCase):
         route = resp['data']
 
         route['update_time'] = int(time.time())
+        route.pop('create_time')
+        route.pop('update_time')
         resp = self.route_api.update(route['id'], route)
         assert resp['code'] == 0
         print(json.dumps(resp, ensure_ascii=False))
