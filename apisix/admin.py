@@ -126,3 +126,21 @@ class UpstreamAPI(AdminAPIBase):
         path = f'/apisix/admin/upstreams/{upstream_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
+
+
+class ServiceAPI(AdminAPIBase):
+
+    def list_services(self):
+        path = '/apisix/admin/services'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def retrieve_service(self, service_id: str):
+        path = f'/apisix/admin/services/{service_id}'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def update_service(self, service_id: str, data: dict):
+        path = f'/apisix/admin/services/{service_id}'
+        url = urljoin(self.domain, path)
+        return self.put(url, data)
