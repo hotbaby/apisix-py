@@ -162,3 +162,21 @@ class RouteAPI(AdminAPIBase):
         path = f'/apisix/admin/routes/{route_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
+
+
+class SSLAPI(AdminAPIBase):
+
+    def list_ssl(self):
+        path = '/apisix/admin/ssl'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def retrieve_ssl(self, ssl_id: str):
+        path = f'/apisix/admin/ssl/{ssl_id}'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def update_ssl(self, ssl_id: str, data: dict):
+        path = f'/apisix/admin/ssl/{ssl_id}'
+        url = urljoin(self.domain, path)
+        return self.put(url, data)
