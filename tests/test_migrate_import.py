@@ -6,9 +6,9 @@ import datetime
 import unittest
 from apisix.admin import MigrateAPI
 
-DOMAIN = 'http://localhost:9000'
+DOMAIN = 'http://apisix.ai-test.speechocean.com'
 USERNAME = 'admin'
-PASSWORD = 'admin'
+PASSWORD = os.environ.get('APISIX_PASSWORD')
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 

@@ -8,15 +8,14 @@ import datetime
 import unittest
 from apisix.admin import SSLAPI
 
-DOMAIN = 'http://apisix.ai-test.speechocean.com'
-USERNAME = 'admin'
-PASSWORD = os.environ.get('APISIX_PASSWORD')
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+from . import config
 
 
 class TestSSLAPI(unittest.TestCase):
     def setUp(self) -> None:
-        self.ssl_api = SSLAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
+        self.ssl_api = SSLAPI(domain=config.DOMAIN,
+                              username=config.USERNAME,
+                              password=config.PASSWORD)
 
     def test_list_ssl(self):
         resp = self.ssl_api.list()

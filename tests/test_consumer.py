@@ -6,15 +6,14 @@ import datetime
 import unittest
 from apisix.admin import ConsumerAPI
 
-DOMAIN = 'http://apisix.ai-test.speechocean.com'
-USERNAME = 'admin'
-PASSWORD = os.environ.get('APISIX_PASSWORD')
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+from . import config
 
 
 class TestConsumerAPI(unittest.TestCase):
     def setUp(self) -> None:
-        self.consumer_api = ConsumerAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
+        self.consumer_api = ConsumerAPI(domain=config.DOMAIN,
+                                        username=config.USERNAME,
+                                        password=config.PASSWORD)
 
     def test_list_consumers(self):
         resp = self.consumer_api.list()
@@ -36,7 +35,8 @@ class TestConsumerAPI(unittest.TestCase):
 
         resp = self.consumer_api.retrieve(consumer['username'])
         consumer = resp['data']
-        consumer['desc'] = f'{datetime.datetime.now().strftime(DATETIME_FORMAT)}'
+        consumer.pop('create_time')
+        consumer.pop('update_time')
         resp = self.consumer_api.update(consumer['username'], consumer)
         print(resp)
         assert resp['code'] == 0

@@ -1,4 +1,5 @@
 # encoding: utf8
+
 import json
 import os
 import time
@@ -6,15 +7,14 @@ import datetime
 import unittest
 from apisix.admin import RouteAPI
 
-DOMAIN = 'http://apisix.ai-test.speechocean.com'
-USERNAME = 'admin'
-PASSWORD = os.environ.get('APISIX_PASSWORD')
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+from . import config
 
 
 class TestRouteAPI(unittest.TestCase):
     def setUp(self) -> None:
-        self.route_api = RouteAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
+        self.route_api = RouteAPI(domain=config.DOMAIN,
+                                  username=config.USERNAME,
+                                  password=config.PASSWORD)
 
     def test_list_routes(self):
         resp = self.route_api.list()

@@ -8,15 +8,14 @@ import datetime
 import unittest
 from apisix.admin import UpstreamAPI
 
-DOMAIN = 'http://apisix.ai-test.speechocean.com'
-USERNAME = 'admin'
-PASSWORD = os.environ.get('APISIX_PASSWORD')
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+from . import config
 
 
 class TestUpstreamAPI(unittest.TestCase):
     def setUp(self) -> None:
-        self.upstream_api = UpstreamAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
+        self.upstream_api = UpstreamAPI(domain=config.DOMAIN,
+                                        username=config.USERNAME,
+                                        password=config.PASSWORD)
 
     def test_list_upstreams(self):
         resp = self.upstream_api.list()
