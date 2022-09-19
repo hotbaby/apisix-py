@@ -2,6 +2,7 @@
 
 import enum
 import json
+import os.path
 from urllib.parse import urljoin
 
 import requests
@@ -89,22 +90,22 @@ class AdminAPIBase:
 
 class ConsumerAPI(AdminAPIBase):
 
-    def list_consumers(self):
+    def list(self):
         path = '/apisix/admin/consumers'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def retrieve_consumer(self, consumer_id: str):
+    def retrieve(self, consumer_id: str):
         path = f'/apisix/admin/consumers/{consumer_id}'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def update_consumer(self, consumer_id: str, data: dict):
+    def update(self, consumer_id: str, data: dict):
         path = f'/apisix/admin/consumers/{consumer_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data=data)
 
-    def delete_consumer(self, consumer_id: str, data: dict):
+    def delete(self, consumer_id: str, data: dict):
         path = f'/apisix/admin/consumers/{consumer_id}'
         url = urljoin(self.domain, path)
         return self.delete(url)
@@ -112,17 +113,17 @@ class ConsumerAPI(AdminAPIBase):
 
 class UpstreamAPI(AdminAPIBase):
 
-    def list_upstreams(self):
+    def list(self):
         path = '/apisix/admin/upstreams'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def retrieve_upstream(self, upstream_id: str):
+    def retrieve(self, upstream_id: str):
         path = f'/apisix/admin/upstreams/{upstream_id}'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def update_upstream(self, upstream_id: str, data: dict):
+    def update(self, upstream_id: str, data: dict):
         path = f'/apisix/admin/upstreams/{upstream_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
@@ -130,17 +131,17 @@ class UpstreamAPI(AdminAPIBase):
 
 class ServiceAPI(AdminAPIBase):
 
-    def list_services(self):
+    def list(self):
         path = '/apisix/admin/services'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def retrieve_service(self, service_id: str):
+    def retrieve(self, service_id: str):
         path = f'/apisix/admin/services/{service_id}'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def update_service(self, service_id: str, data: dict):
+    def update(self, service_id: str, data: dict):
         path = f'/apisix/admin/services/{service_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
@@ -148,17 +149,17 @@ class ServiceAPI(AdminAPIBase):
 
 class RouteAPI(AdminAPIBase):
 
-    def list_routes(self):
+    def list(self):
         path = '/apisix/admin/routes'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def retrieve_route(self, route_id: str):
+    def retrieve(self, route_id: str):
         path = f'/apisix/admin/routes/{route_id}'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def update_route(self, route_id: str, data: dict):
+    def update(self, route_id: str, data: dict):
         path = f'/apisix/admin/routes/{route_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
@@ -166,17 +167,38 @@ class RouteAPI(AdminAPIBase):
 
 class SSLAPI(AdminAPIBase):
 
-    def list_ssl(self):
+    def list(self):
         path = '/apisix/admin/ssl'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def retrieve_ssl(self, ssl_id: str):
+    def retrieve(self, ssl_id: str):
         path = f'/apisix/admin/ssl/{ssl_id}'
         url = urljoin(self.domain, path)
         return self.get(url)
 
-    def update_ssl(self, ssl_id: str, data: dict):
+    def update(self, ssl_id: str, data: dict):
         path = f'/apisix/admin/ssl/{ssl_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
+
+
+class MigrateAPI(AdminAPIBase):
+
+    def export_data(self, output_dir: str):
+        # export ssl
+        ssl_api = SSLAPI(self.domain, self.username, self.password)
+        for row in ssl_api.list()['data']['rows']:
+            resp = ssl_api.retrieve(row['id'])
+            assert resp['code'] == 0
+            path = os.path.join(output_dir, f'ssl-{row["id"]}.json')
+            with open(path, 'w') as f:
+                f.write(json.dumps(resp['data'], ensure_ascii=False))
+
+        # export upstream
+        upstream_api = UpstreamAPI(self.domain, self.username, self.password)
+        for row in upstream_api.list()['data']['rows']:
+            upstream_api.retrieve(row['id'])
+
+    def import_data(self,):
+        pass

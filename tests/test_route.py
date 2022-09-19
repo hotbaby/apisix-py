@@ -12,34 +12,34 @@ PASSWORD = os.environ.get('APISIX_PASSWORD')
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
-class TestConsumer(unittest.TestCase):
+class TestRouteAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.route_api = RouteAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
 
     def test_list_routes(self):
-        resp = self.route_api.list_routes()
+        resp = self.route_api.list()
         assert resp['code'] == 0
         print(json.dumps(resp, ensure_ascii=False))
 
     def test_retrieve_route(self):
-        resp = self.route_api.list_routes()
+        resp = self.route_api.list()
         assert resp['code'] == 0
         route = resp['data']['rows'][0]
 
-        resp = self.route_api.retrieve_route(route['id'])
+        resp = self.route_api.retrieve(route['id'])
         assert resp['code'] == 0
         print(json.dumps(resp, ensure_ascii=False))
 
     def test_update_route(self):
-        resp = self.route_api.list_routes()
+        resp = self.route_api.list()
         assert resp['code'] == 0
         route = resp['data']['rows'][0]
 
-        resp = self.route_api.retrieve_route(route['id'])
+        resp = self.route_api.retrieve(route['id'])
         assert resp['code'] == 0
         route = resp['data']
 
         route['update_time'] = int(time.time())
-        resp = self.route_api.update_route(route['id'], route)
+        resp = self.route_api.update(route['id'], route)
         assert resp['code'] == 0
         print(json.dumps(resp, ensure_ascii=False))
