@@ -47,3 +47,4 @@ runtime/core/grpc/wenet.pb.h
 .cache
 compile_commands.json
 migrate/*
+*.tar.gz
