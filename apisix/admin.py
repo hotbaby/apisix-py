@@ -202,13 +202,15 @@ class SSLAPI(AdminAPIBase):
 class MigrateAPI(AdminAPIBase):
 
     def export_data(self, config_path: str):
-        ssl_api = SSLAPI(self.domain, self.username, self.password)
-        upstream_api = UpstreamAPI(self.domain, self.username, self.password)
-        service_api = ServiceAPI(self.domain, self.username, self.password)
-        route_api = RouteAPI(self.domain, self.username, self.password)
-        consumer_api = ConsumerAPI(self.domain, self.username, self.password)
+        apis = [
+            # SSLAPI(self.domain, self.username, self.password),
+            UpstreamAPI(self.domain, self.username, self.password),
+            ServiceAPI(self.domain, self.username, self.password),
+            RouteAPI(self.domain, self.username, self.password),
+            ConsumerAPI(self.domain, self.username, self.password)
+        ]
 
-        for api in [ssl_api, upstream_api, service_api, route_api, consumer_api]:
+        for api in apis:
             for row in api.list()['data']['rows']:
                 resp = api.retrieve(row[api.id_name])
                 assert resp['code'] == 0
@@ -223,14 +225,16 @@ class MigrateAPI(AdminAPIBase):
                 print(f'export {os.path.basename(path)} successfully')
 
     def import_data(self, config_path: str):
-        ssl_api = SSLAPI(self.domain, self.username, self.password)
-        upstream_api = UpstreamAPI(self.domain, self.username, self.password)
-        service_api = ServiceAPI(self.domain, self.username, self.password)
-        route_api = RouteAPI(self.domain, self.username, self.password)
-        consumer_api = ConsumerAPI(self.domain, self.username, self.password)
+        apis = [
+            # SSLAPI(self.domain, self.username, self.password),
+            UpstreamAPI(self.domain, self.username, self.password),
+            ServiceAPI(self.domain, self.username, self.password),
+            RouteAPI(self.domain, self.username, self.password),
+            ConsumerAPI(self.domain, self.username, self.password)
+        ]
 
         p = pathlib.Path(config_path)
-        for api in [ssl_api, upstream_api, service_api, route_api, consumer_api]:
+        for api in apis:
             for item in list(p.glob(f'{api.name}/*.json')):
                 with open(str(item)) as f:
                     data = json.load(f)
