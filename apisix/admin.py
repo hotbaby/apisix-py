@@ -144,3 +144,21 @@ class ServiceAPI(AdminAPIBase):
         path = f'/apisix/admin/services/{service_id}'
         url = urljoin(self.domain, path)
         return self.put(url, data)
+
+
+class RouteAPI(AdminAPIBase):
+
+    def list_routes(self):
+        path = '/apisix/admin/routes'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def retrieve_route(self, route_id: str):
+        path = f'/apisix/admin/routes/{route_id}'
+        url = urljoin(self.domain, path)
+        return self.get(url)
+
+    def update_route(self, route_id: str, data: dict):
+        path = f'/apisix/admin/routes/{route_id}'
+        url = urljoin(self.domain, path)
+        return self.put(url, data)
