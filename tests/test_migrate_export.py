@@ -12,7 +12,7 @@ PASSWORD = os.environ.get('APISIX_PASSWORD')
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
-class TestMigrateAPI(unittest.TestCase):
+class TestMigrateExportAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.migrate_api = MigrateAPI(domain=DOMAIN, username=USERNAME, password=PASSWORD)
 

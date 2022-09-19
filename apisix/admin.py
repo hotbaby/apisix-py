@@ -3,6 +3,7 @@
 import enum
 import json
 import os.path
+import pathlib
 from urllib.parse import urljoin
 
 import requests
@@ -67,7 +68,8 @@ class AdminAPIBase:
             assert f'Unknown http method {method}!'
 
         if resp.status_code != 200:
-            raise APISIXException(f'request error, url: {url}, method:{method}, data: {data}, resp: {resp}')
+            raise APISIXException(f'request error, url: {url}, method:{method}, data: {data}, '
+                                  f'resp_status_code: {resp.status_code}, resp_text: {resp.text}')
 
         return resp.json()
 
@@ -89,6 +91,8 @@ class AdminAPIBase:
 
 
 class ConsumerAPI(AdminAPIBase):
+    name = 'consumer'
+    id_name = 'username'
 
     def list(self):
         path = '/apisix/admin/consumers'
@@ -113,6 +117,9 @@ class ConsumerAPI(AdminAPIBase):
 
 class UpstreamAPI(AdminAPIBase):
 
+    name = 'upstream'
+    id_name = 'id'
+
     def list(self):
         path = '/apisix/admin/upstreams'
         url = urljoin(self.domain, path)
@@ -130,6 +137,9 @@ class UpstreamAPI(AdminAPIBase):
 
 
 class ServiceAPI(AdminAPIBase):
+
+    name = 'service'
+    id_name = 'id'
 
     def list(self):
         path = '/apisix/admin/services'
@@ -149,6 +159,9 @@ class ServiceAPI(AdminAPIBase):
 
 class RouteAPI(AdminAPIBase):
 
+    name = 'route'
+    id_name = 'id'
+
     def list(self):
         path = '/apisix/admin/routes'
         url = urljoin(self.domain, path)
@@ -166,6 +179,9 @@ class RouteAPI(AdminAPIBase):
 
 
 class SSLAPI(AdminAPIBase):
+
+    name = 'ssl'
+    id_name = 'id'
 
     def list(self):
         path = '/apisix/admin/ssl'
@@ -185,20 +201,44 @@ class SSLAPI(AdminAPIBase):
 
 class MigrateAPI(AdminAPIBase):
 
-    def export_data(self, output_dir: str):
-        # export ssl
+    def export_data(self, config_path: str):
         ssl_api = SSLAPI(self.domain, self.username, self.password)
-        for row in ssl_api.list()['data']['rows']:
-            resp = ssl_api.retrieve(row['id'])
-            assert resp['code'] == 0
-            path = os.path.join(output_dir, f'ssl-{row["id"]}.json')
-            with open(path, 'w') as f:
-                f.write(json.dumps(resp['data'], ensure_ascii=False))
-
-        # export upstream
         upstream_api = UpstreamAPI(self.domain, self.username, self.password)
-        for row in upstream_api.list()['data']['rows']:
-            upstream_api.retrieve(row['id'])
+        service_api = ServiceAPI(self.domain, self.username, self.password)
+        route_api = RouteAPI(self.domain, self.username, self.password)
+        consumer_api = ConsumerAPI(self.domain, self.username, self.password)
 
-    def import_data(self,):
-        pass
+        for api in [ssl_api, upstream_api, service_api, route_api, consumer_api]:
+            for row in api.list()['data']['rows']:
+                resp = api.retrieve(row[api.id_name])
+                assert resp['code'] == 0
+
+                path = os.path.join(config_path, api.name, f'{api.name}-{row[api.id_name]}.json')
+                if not os.path.exists(os.path.dirname(path)):
+                    os.makedirs(os.path.dirname(path))
+
+                with open(path, 'w') as f:
+                    f.write(json.dumps(resp['data'], ensure_ascii=False))
+
+                print(f'export {os.path.basename(path)} successfully')
+
+    def import_data(self, config_path: str):
+        ssl_api = SSLAPI(self.domain, self.username, self.password)
+        upstream_api = UpstreamAPI(self.domain, self.username, self.password)
+        service_api = ServiceAPI(self.domain, self.username, self.password)
+        route_api = RouteAPI(self.domain, self.username, self.password)
+        consumer_api = ConsumerAPI(self.domain, self.username, self.password)
+
+        p = pathlib.Path(config_path)
+        for api in [ssl_api, upstream_api, service_api, route_api, consumer_api]:
+            for item in list(p.glob(f'{api.name}/*.json')):
+                with open(str(item)) as f:
+                    data = json.load(f)
+
+                    # bugfix {"code":10000,"message":"we don't accept create_time from client"}
+                    data.pop('create_time')
+                    data.pop('update_time')
+
+                    api.update(data[api.id_name], data)
+
+                    print(f'import {item.name} successfully')
